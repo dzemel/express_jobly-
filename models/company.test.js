@@ -85,6 +85,50 @@ describe("findAll", function () {
       },
     ]);
   });
+  
+  test("works: with filter", async function () {
+    let companyF = await Company.findAll({name: "1"});
+    console.log(companyF)
+    expect(companyF).toEqual([
+      {
+        handle: "c1",
+        name: "C1",
+        description: "Desc1",
+        numEmployees: 1,
+        logoUrl: "http://c1.img",
+      }
+    ]);
+  });
+  
+  test("works: name must be valid", async function () {
+    let companyF = await Company.findAll({name: "904543ju3j"});
+    console.log(companyF)
+    expect(companyF).toEqual([
+      
+    ]);
+  });
+
+  test("works: filter maxEmployees", async function () {
+    let companyF = await Company.findAll({maxEmployees: "1"});
+    console.log(companyF)
+    expect(companyF).toEqual([
+      {
+        handle: "c1",
+        name: "C1",
+        description: "Desc1",
+        numEmployees: 1,
+        logoUrl: "http://c1.img",
+      }
+    ]);
+  });
+
+  test("works: filter sadpath maxEmployees", async function () {
+    let companyF = await Company.findAll({maxEmployees: "-1"});
+    console.log(companyF)
+    expect(companyF).toEqual([
+      
+    ]);
+  });
 });
 
 /************************************** get */
