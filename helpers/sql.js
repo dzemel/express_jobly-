@@ -13,6 +13,7 @@ jsToSql{
   firstName:"what ever is currently there"
   age = "whatever is there"
 }
+
 */
 
 function sqlForPartialUpdate(dataToUpdate, jsToSql) {

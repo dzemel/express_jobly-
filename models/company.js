@@ -44,20 +44,47 @@ class Company {
    * Returns [{ handle, name, description, numEmployees, logoUrl }, ...]
    * */
 
-  static async findAll(filters) {
-    let { name, minEmployees, maxEmployees } = filters;
-    const companiesRes = await db.query(
+  static async findAll(filters = {}) {
+    const { name, minEmployees, maxEmployees } = filters;
+    let companiesQuery = 
       `SELECT handle,
-                  name,
-                  description,
-                  num_employees AS "numEmployees",
-                  logo_url AS "logoUrl"
-           FROM companies
-           WHERE name = $1 AND employees BETWEEN $2 AND $3,
-           ORDER BY name`,
-      [name, minEmployees, maxEmployees]
-    );
-    return companiesRes.rows;
+                name,
+                description,
+                num_employees AS "numEmployees",
+                logo_url AS "logoUrl"
+           FROM companies`;
+
+    let sqlWhereAnd = [];
+    let queryValues = [];
+
+    if (minEmployees !== undefined) {
+      queryValues.push(minEmployees);
+      sqlWhereAnd.push(`num_employees >= $${queryValues.length}`);
+    }
+
+    if (maxEmployees !== undefined) {
+      queryValues.push(maxEmployees);
+      sqlWhereAnd.push(`num_employees <= $${queryValues.length}`);
+    }
+
+    if (minEmployees > maxEmployees) {
+      throw new BadRequestError(
+        "Max employees must be greater than Min employees"
+      );
+    }
+    
+    if (name) {
+      queryValues.push(`%${name}%`);
+      sqlWhereAnd.push(`name ILIKE $${queryValues.length}`);
+    }
+
+    if (sqlWhereAnd.length > 0) {
+      companiesQuery += " WHERE " + sqlWhereAnd.join(" AND ");
+    }
+    companiesQuery += " ORDER BY name";
+    const companyResults = await db.query(companiesQuery, queryValues)
+    return companyResults.rows;
+
   }
 
   /** Given a company handle, return data about company.
