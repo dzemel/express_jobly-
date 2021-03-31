@@ -11,9 +11,9 @@ const Company = require("../models/company");
 
 const companyNewSchema = require("../schemas/companyNew.json");
 const companyUpdateSchema = require("../schemas/companyUpdate.json");
+const searchCompaniesSchema = require("../schemas/searchCompanies.json");
 
 const router = new express.Router();
-
 
 /** POST / { company } =>  { company }
  *
@@ -27,7 +27,7 @@ const router = new express.Router();
 router.post("/", ensureLoggedIn, async function (req, res, next) {
   const validator = jsonschema.validate(req.body, companyNewSchema);
   if (!validator.valid) {
-    const errs = validator.errors.map(e => e.stack);
+    const errs = validator.errors.map((e) => e.stack);
     throw new BadRequestError(errs);
   }
 
@@ -47,7 +47,27 @@ router.post("/", ensureLoggedIn, async function (req, res, next) {
  */
 
 router.get("/", async function (req, res, next) {
-  const companies = await Company.findAll();
+  const { name, minEmployees, maxEmployees } = req.query;
+
+  if (minEmployees !== undefined) {
+    minEmployees = +minEmployees;
+  }
+  if (maxEmployees !== undefined) {
+    maxEmployees = +maxEmployees;
+  }
+
+  const validator = jsonschema.validate(req.query, searchCompaniesSchema);
+  if (!validator.valid) {
+    const errs = validator.errors.map((e) => e.stack);
+    throw new BadRequestError(errs);
+  }
+  if (minEmployees > maxEmployees) {
+    throw new BadRequestError(
+      "Max employees must be greater than Min employees"
+    );
+  }
+
+  const companies = await Company.findAll(name, minEmployees, maxEmployees);
   return res.json({ companies });
 });
 
@@ -78,7 +98,7 @@ router.get("/:handle", async function (req, res, next) {
 router.patch("/:handle", ensureLoggedIn, async function (req, res, next) {
   const validator = jsonschema.validate(req.body, companyUpdateSchema);
   if (!validator.valid) {
-    const errs = validator.errors.map(e => e.stack);
+    const errs = validator.errors.map((e) => e.stack);
     throw new BadRequestError(errs);
   }
 
@@ -95,6 +115,5 @@ router.delete("/:handle", ensureLoggedIn, async function (req, res, next) {
   await Company.remove(req.params.handle);
   return res.json({ deleted: req.params.handle });
 });
-
 
 module.exports = router;
