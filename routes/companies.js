@@ -48,18 +48,14 @@ router.post("/", ensureAdmin, async function (req, res, next) {
 
 router.get("/", async function (req, res, next) {
   const query = req.query;
-<<<<<<< HEAD
-  //if minimum and maximum num of employees is defined than convert from string to int.
-=======
   console.log(query);
->>>>>>> da9ba417d0106ab70d79bac584e00af14249af66
   if (query.minEmployees !== undefined) {
     query.minEmployees = +query.minEmployees;
   }
   if (query.maxEmployees !== undefined) {
     query.maxEmployees = +query.maxEmployees;
   }
-  //Check that all fields for companies entered into the 
+  //Check that all fields for companies entered into the
   //query string are valid according to the schema.
   const validator = jsonschema.validate(query, searchCompaniesSchema);
   if (!validator.valid) {
