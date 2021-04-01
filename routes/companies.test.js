@@ -127,7 +127,7 @@ describe("GET /companies", function () {
   test("works: filtering on all keys", async function () {
     const resp = await request(app)
         .get("/companies")
-        .query({ minEmployees: 1, maxEmployees: 2, name: "2" });
+        .query({ minEmployees: 1, maxEmployees: 2, name: "" });
     expect(resp.body).toEqual({
       companies: [
         {
@@ -258,5 +258,6 @@ describe("DELETE /companies/:handle", function () {
         .delete(`/companies/nope`)
         .set("authorization", `Bearer ${u1Token}`);
     expect(resp.statusCode).toEqual(404);
+    });
   });
 });

@@ -87,7 +87,7 @@ class Company {
       companiesQuery += " WHERE " + sqlWhereAnd.join(" AND ");
     }
     //add order by company name to sql query.
-    //query by sql query with queryValues as validation anf return.
+    //query by sql query with queryValues as validation and return.
     companiesQuery += " ORDER BY name";
     const companyResults = await db.query(companiesQuery, queryValues)
     return companyResults.rows;
