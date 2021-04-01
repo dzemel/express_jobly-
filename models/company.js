@@ -45,6 +45,8 @@ class Company {
    * */
 
   static async findAll(filters = {}) {
+    //grab the query params entered into the route function.
+    //set a base query to modify. 
     const { name, minEmployees, maxEmployees } = filters;
     let companiesQuery = 
       `SELECT handle,
@@ -54,33 +56,38 @@ class Company {
                 logo_url AS "logoUrl"
            FROM companies`;
 
+    //make arrays to hold sql query WHERE AND additions and 
+    //array storing specific company info to input.
     let sqlWhereAnd = [];
     let queryValues = [];
 
+    //if min or max employees exist exist then add them to the arrays.
     if (minEmployees !== undefined) {
       queryValues.push(minEmployees);
-      sqlWhereAnd.push(`num_employees >= $${queryValues.length}`);
+      sqlWhereAnd.push(`num_employees >= $${queryValues.length}`); 
     }
 
     if (maxEmployees !== undefined) {
       queryValues.push(maxEmployees);
       sqlWhereAnd.push(`num_employees <= $${queryValues.length}`);
     }
-
+    //if min greater than max throw bad request error.
     if (minEmployees > maxEmployees) {
       throw new BadRequestError(
         "Max employees must be greater than Min employees"
       );
     }
-    
+    //if name is valid than push it to both query strings.
     if (name) {
       queryValues.push(`%${name}%`);
       sqlWhereAnd.push(`name ILIKE $${queryValues.length}`);
     }
-
+    //If the length of the first sql array is greater than 0 add necessary sequel statements to it.
     if (sqlWhereAnd.length > 0) {
       companiesQuery += " WHERE " + sqlWhereAnd.join(" AND ");
     }
+    //add order by company name to sql query.
+    //query by sql query with queryValues as validation anf return.
     companiesQuery += " ORDER BY name";
     const companyResults = await db.query(companiesQuery, queryValues)
     return companyResults.rows;

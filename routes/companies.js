@@ -48,20 +48,21 @@ router.post("/", ensureLoggedIn, async function (req, res, next) {
 
 router.get("/", async function (req, res, next) {
   const query = req.query;
-  console.log(query)
+  //if minimum and maximum num of employees is defined than convert from string to int.
   if (query.minEmployees !== undefined) {
     query.minEmployees = +query.minEmployees;
   }
   if (query.maxEmployees !== undefined) {
     query.maxEmployees = +query.maxEmployees;
   }
-
+  //Check that all fields for companies entered into the 
+  //query string are valid according to the schema.
   const validator = jsonschema.validate(query, searchCompaniesSchema);
   if (!validator.valid) {
     const errs = validator.errors.map((e) => e.stack);
     throw new BadRequestError(errs);
   }
-
+  //find all companies that fit the query criteria and return them as JSON.
   const companies = await Company.findAll(query);
   return res.json({ companies });
 });

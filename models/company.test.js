@@ -122,7 +122,7 @@ describe("findAll", function () {
     ]);
   });
 
-  test("works: filter sadpath maxEmployees", async function () {
+  test("works: filter sad path maxEmployees", async function () {
     let companyF = await Company.findAll({maxEmployees: "-1"});
     console.log(companyF)
     expect(companyF).toEqual([
