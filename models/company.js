@@ -99,10 +99,13 @@ class Company {
    * Returns { handle, name, description, numEmployees, logoUrl, jobs }
    *   where jobs is [{ id, title, salary, equity, companyHandle }, ...]
    *
+   * Returns jobs associated with company as well.
+   * 
    * Throws NotFoundError if not found.
    **/
 
   static async get(handle) {
+    //Find company by name(handle).
     const companyRes = await db.query(
       `SELECT handle,
                   name,
@@ -117,7 +120,16 @@ class Company {
     const company = companyRes.rows[0];
 
     if (!company) throw new NotFoundError(`No company: ${handle}`);
-
+    //Find all jobs associated with company
+    const jobResults = await db.query(
+          `SELECT id, title, salary, equity
+           FROM jobs
+           WHERE company_handle = $1
+           ORDER BY title`,
+           [handle],
+    );
+    //add jobs found in sql query to company as a key.
+    company.jobs = jobResults.rows;
     return company;
   }
 

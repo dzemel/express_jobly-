@@ -11,6 +11,7 @@ const User = require("../models/user");
 const { createToken } = require("../helpers/tokens");
 const userNewSchema = require("../schemas/userNew.json");
 const userUpdateSchema = require("../schemas/userUpdate.json");
+const jobApplicationSchema = require("../schemas/jobApplication.json");
 
 const router = express.Router();
 
@@ -102,6 +103,21 @@ router.delete(
   async function (req, res, next) {
     await User.remove(req.params.username);
     return res.json({ deleted: req.params.username });
+  }
+);
+
+router.post(
+  "/:username/jobs/:id",
+  ensureLoggedIn || ensureAdmin,
+  async function (req, res, next) {
+    console.log(req.query)
+    const validator = jsonschema.validate(req.body, jobApplication);
+    if (!validator.valid) {
+      const errs = validator.errors.map(e => e.stack);
+      throw new BadRequestError(errs);
+    }
+    let applied = await User.apply(req.params.body);
+    return res.json({"applied": applied.job.id});
   }
 );
 
