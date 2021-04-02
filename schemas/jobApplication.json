@@ -3,11 +3,13 @@
   "$id": "http://our.company.com/companyUpdate.schema.json",
   "type": "object",
   "properties": {
-    "name": {
-      "username": "string",
-      "minLength": 1,
-      "maxLength": 30
+    
+    "username": {
+    "type": "string",
+    "minLength": 1,
+    "maxLength": 30
     },
+
     "id": {
       "type": "integer",
       "minimum": 0

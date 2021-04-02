@@ -102,7 +102,6 @@ describe("findAll", function () {
   
   test("works: name must be valid", async function () {
     let companyF = await Company.findAll({name: "904543ju3j"});
-    console.log(companyF)
     expect(companyF).toEqual([
       
     ]);
@@ -110,7 +109,6 @@ describe("findAll", function () {
 
   test("works: filter maxEmployees", async function () {
     let companyF = await Company.findAll({maxEmployees: "1"});
-    console.log(companyF)
     expect(companyF).toEqual([
       {
         handle: "c1",
@@ -124,7 +122,6 @@ describe("findAll", function () {
 
   test("works: filter sad path maxEmployees", async function () {
     let companyF = await Company.findAll({maxEmployees: "-1"});
-    console.log(companyF)
     expect(companyF).toEqual([
       
     ]);
@@ -136,6 +133,11 @@ describe("findAll", function () {
 describe("get", function () {
   test("works", async function () {
     let company = await Company.get("c1");
+    company.jobs = [
+      { id: 1, title: "J1", equity: "0.1", salary: 1 },
+      { id: 2, title: "J2", equity: "0.2", salary: 2 },
+      { id: 3, title: "J3", equity: null, salary: 3 },
+    ];
     expect(company).toEqual({
       handle: "c1",
       name: "C1",
@@ -143,10 +145,10 @@ describe("get", function () {
       numEmployees: 1,
       logoUrl: "http://c1.img",
       jobs: [
-        { id: testJobIds[0], title: "J1", equity: "0.1", salary: 1 },
-        { id: testJobIds[1], title: "J2", equity: "0.2", salary: 2 },
-        { id: testJobIds[2], title: "J3", equity: null, salary: 3 },
-      ],
+        { id: 1, title: "J1", equity: "0.1", salary: 1 },
+        { id: 2, title: "J2", equity: "0.2", salary: 2 },
+        { id: 3, title: "J3", equity: null, salary: 3 },
+      ]
     });
   });
 

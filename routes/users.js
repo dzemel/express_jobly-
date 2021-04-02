@@ -106,18 +106,26 @@ router.delete(
   }
 );
 
+//application for jobs route.
+//Inserts user application info into applications database for job.
+//Returns JSON of the id of the job id they applied for.
 router.post(
   "/:username/jobs/:id",
   ensureLoggedIn || ensureAdmin,
   async function (req, res, next) {
-    console.log(req.query)
-    const validator = jsonschema.validate(req.body, jobApplication);
+    //get username and Id from request.
+    let {username} = req.params;
+    let {id} = req.params;
+    //validate JSON
+    const validator = jsonschema.validate(req.body, jobApplicationSchema);
     if (!validator.valid) {
       const errs = validator.errors.map(e => e.stack);
       throw new BadRequestError(errs);
     }
-    let applied = await User.apply(req.params.body);
-    return res.json({"applied": applied.job.id});
+    //Insert application into database.
+    let applied = await User.apply(username, Number(id));
+    
+    return res.json({"applied": applied.job_id});
   }
 );
 

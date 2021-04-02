@@ -120,6 +120,8 @@ class User {
    * Returns { username, first_name, last_name, is_admin, jobs }
    *   where jobs is { id, title, company_handle, company_name, state }
    *
+   * Also return jobs this user has applied to.
+   * 
    * Throws NotFoundError if user not found.
    **/
 
@@ -138,6 +140,19 @@ class User {
     const user = userRes.rows[0];
 
     if (!user) throw new NotFoundError(`No user: ${username}`);
+    //Get jobs this user has applied to in SQL query.
+    //Add these jobs as a key-val pair to user object.
+    const jobs = await db.query(
+      `SELECT job_id from applications
+      WHERE username = $1`,
+      [username],
+    );
+    
+    const jobVals = jobs.rows[0];
+
+    user["jobs"] = jobVals;
+
+    console.log(user);
 
     return user;
   }
@@ -205,13 +220,16 @@ class User {
     if (!user) throw new NotFoundError(`No user: ${username}`);
   }
 
+  //Apply to a specific job. Return username and job id number.
   static async apply(username, job_id) {
+    //Insert application for user into database.
     let result = await db.query(
     `INSERT into applications(username, job_id)
-    VALUES($1, $2,)
-    RETURNING id, username, job_id`,
+    VALUES($1, $2)
+    RETURNING username, job_id`,
     [username, job_id]);
     let application = result.rows[0];
+    //return application info.
     return application;
   }
 }
