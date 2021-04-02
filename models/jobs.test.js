@@ -14,7 +14,7 @@ beforeAll(commonBeforeAll);
 beforeEach(commonBeforeEach);
 afterEach(commonAfterEach);
 afterAll(commonAfterAll);
-console.log("testing");
+
 //test creating a job
 describe("create", function () {
   const newJob = {
@@ -49,7 +49,6 @@ describe("findAll", function () {
            ('Job4', NULL, NULL, 'c1')
     RETURNING id`);
     let testJobIds = resultsJobs.rows.map((r) => r.id);
-    console.log("testJobIds", testJobIds);
     let jobs = await Job.findAll();
     expect(jobs).toEqual([
       {

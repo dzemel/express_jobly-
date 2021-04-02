@@ -13,6 +13,7 @@ const {
   commonAfterEach,
   commonAfterAll,
 } = require("./_testCommon");
+const Job = require("./jobs");
 
 beforeAll(commonBeforeAll);
 beforeEach(commonBeforeEach);
@@ -133,6 +134,13 @@ describe("findAll", function () {
 
 describe("get", function () {
   test("works", async function () {
+    let job = await Job.create({
+      title: "rithm co-founder",
+      salary: 50,
+      equity: 0.2,
+      companyHandle: "c3",
+    });
+    await User.apply("u1", job.id);
     let user = await User.get("u1");
     expect(user).toEqual({
       username: "u1",
@@ -140,6 +148,7 @@ describe("get", function () {
       lastName: "U1L",
       email: "u1@email.com",
       isAdmin: false,
+      jobs: [expect.anything()],
     });
   });
 
@@ -214,8 +223,7 @@ describe("update", function () {
 describe("remove", function () {
   test("works", async function () {
     await User.remove("u1");
-    const res = await db.query(
-        "SELECT * FROM users WHERE username='u1'");
+    const res = await db.query("SELECT * FROM users WHERE username='u1'");
     expect(res.rows.length).toEqual(0);
   });
 

@@ -114,18 +114,12 @@ router.post(
   ensureLoggedIn || ensureAdmin,
   async function (req, res, next) {
     //get username and Id from request.
-    let {username} = req.params;
-    let {id} = req.params;
-    //validate JSON
-    const validator = jsonschema.validate(req.body, jobApplicationSchema);
-    if (!validator.valid) {
-      const errs = validator.errors.map(e => e.stack);
-      throw new BadRequestError(errs);
-    }
+    let { username } = req.params;
+    let { id } = req.params;
     //Insert application into database.
     let applied = await User.apply(username, Number(id));
-    
-    return res.json({"applied": applied.job_id});
+
+    return res.json({ applied: applied.job_id });
   }
 );
 
